@@ -87,21 +87,20 @@ const RegistrationForm = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("https://aviadigitalmind.app.n8n.cloud/webhook/AI-BUDDY-MAIN", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          fullName: formData.fullName,
-          guardianName: formData.guardianName,
-          classGrade: formData.classGrade,
-          language: formData.language,
-          location: formData.location,
-          email: formData.email,
-          password: formData.password,
-          timestamp: new Date().toISOString()
-        })
+      // Create URL with query parameters for GET request
+      const params = new URLSearchParams({
+        fullName: formData.fullName,
+        guardianName: formData.guardianName,
+        classGrade: formData.classGrade,
+        language: formData.language,
+        location: formData.location,
+        email: formData.email,
+        password: formData.password,
+        timestamp: new Date().toISOString()
+      });
+      
+      const response = await fetch(`https://aviadigitalmind.app.n8n.cloud/webhook/AI-BUDDY-MAIN?${params}`, {
+        method: "GET"
       });
 
       if (response.ok) {
