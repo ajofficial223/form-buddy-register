@@ -32,6 +32,7 @@ const RegistrationForm = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Partial<FormData>>({});
+  const [webhookResponse, setWebhookResponse] = useState<string>("");
 
   const validateForm = (): boolean => {
     const newErrors: Partial<FormData> = {};
@@ -104,6 +105,9 @@ const RegistrationForm = () => {
       });
 
       if (response.ok) {
+        const responseText = await response.text();
+        setWebhookResponse(responseText);
+        
         toast({
           title: "Registration Successful!",
           description: "Your account has been created successfully.",
@@ -122,6 +126,8 @@ const RegistrationForm = () => {
           confirmPassword: ""
         });
       } else {
+        const errorText = await response.text();
+        setWebhookResponse(`Error: ${errorText}`);
         throw new Error("Registration failed");
       }
     } catch (error) {
@@ -306,6 +312,13 @@ const RegistrationForm = () => {
               )}
             </Button>
           </form>
+          
+          {webhookResponse && (
+            <div className="mt-6 p-4 bg-secondary/50 rounded-lg border">
+              <h3 className="text-sm font-medium text-foreground mb-2">Webhook Response:</h3>
+              <pre className="text-xs text-muted-foreground whitespace-pre-wrap break-words">{webhookResponse}</pre>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
