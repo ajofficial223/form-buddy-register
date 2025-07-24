@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, UserPlus, CheckCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface FormData {
   fullName: string;
@@ -20,6 +21,7 @@ interface FormData {
 
 const RegistrationForm = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
     fullName: "",
     guardianName: "",
@@ -32,7 +34,6 @@ const RegistrationForm = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Partial<FormData>>({});
-  const [webhookResponse, setWebhookResponse] = useState<string>("");
 
   const validateForm = (): boolean => {
     const newErrors: Partial<FormData> = {};
@@ -87,58 +88,17 @@ const RegistrationForm = () => {
 
     setIsSubmitting(true);
 
-    try {
-      // Create URL with query parameters for GET request
-      const params = new URLSearchParams({
-        fullName: formData.fullName,
-        guardianName: formData.guardianName,
-        classGrade: formData.classGrade,
-        language: formData.language,
-        location: formData.location,
-        email: formData.email,
-        password: formData.password,
-        timestamp: new Date().toISOString()
+    // Simulate form processing
+    setTimeout(() => {
+      toast({
+        title: "Registration Successful!",
+        description: "Redirecting to chatbot...",
+        action: <CheckCircle className="h-4 w-4" />
       });
       
-      const response = await fetch(`https://aviadigitalmind.app.n8n.cloud/webhook/AI-BUDDY-MAIN?${params}`, {
-        method: "GET"
-      });
-
-      if (response.ok) {
-        const responseText = await response.text();
-        setWebhookResponse(responseText);
-        
-        toast({
-          title: "Registration Successful!",
-          description: "Your account has been created successfully.",
-          action: <CheckCircle className="h-4 w-4" />
-        });
-        
-        // Reset form
-        setFormData({
-          fullName: "",
-          guardianName: "",
-          classGrade: "",
-          language: "",
-          location: "",
-          email: "",
-          password: "",
-          confirmPassword: ""
-        });
-      } else {
-        const errorText = await response.text();
-        setWebhookResponse(`Error: ${errorText}`);
-        throw new Error("Registration failed");
-      }
-    } catch (error) {
-      toast({
-        title: "Registration Failed",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
       setIsSubmitting(false);
-    }
+      navigate('/chatbot');
+    }, 1000);
   };
 
   return (
@@ -312,13 +272,6 @@ const RegistrationForm = () => {
               )}
             </Button>
           </form>
-          
-          {webhookResponse && (
-            <div className="mt-6 p-4 bg-secondary/50 rounded-lg border">
-              <h3 className="text-sm font-medium text-foreground mb-2">Webhook Response:</h3>
-              <pre className="text-xs text-muted-foreground whitespace-pre-wrap break-words">{webhookResponse}</pre>
-            </div>
-          )}
         </CardContent>
       </Card>
     </div>
