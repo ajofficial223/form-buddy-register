@@ -134,7 +134,7 @@ const Chatbot = () => {
       {/* Chat Container */}
       <div className="flex-1 max-w-4xl mx-auto w-full px-4 py-6 flex flex-col">
         {/* Messages */}
-        <Card className="flex-1 mb-4 bg-card/95 backdrop-blur-sm border-0 shadow-elegant">
+        <Card className="flex-1 mb-4 bg-card/95 backdrop-blur-sm border shadow-form">
           <CardContent className="p-0 h-[500px] overflow-y-auto">
             <div className="p-6 space-y-6">
               {messages.map((message, index) => (
@@ -151,8 +151,8 @@ const Chatbot = () => {
                   <div className={cn(
                     "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110",
                     message.type === 'user' 
-                      ? 'bg-gradient-primary text-white shadow-primary/25' 
-                      : 'bg-gradient-to-br from-secondary to-secondary/80 text-secondary-foreground shadow-secondary/25'
+                      ? 'bg-gradient-primary text-primary-foreground' 
+                      : 'bg-secondary text-secondary-foreground'
                   )}>
                     {message.type === 'user' ? (
                       <User className="h-5 w-5" />
@@ -164,12 +164,12 @@ const Chatbot = () => {
                     "flex-1 max-w-[75%] transition-all duration-300",
                     message.type === 'user' ? 'text-right' : 'text-left'
                   )}>
-                    <div className={cn(
-                      "inline-block p-4 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl",
-                      message.type === 'user'
-                        ? 'bg-gradient-primary text-white rounded-br-md shadow-primary/20'
-                        : 'bg-card border border-border/50 text-foreground rounded-bl-md hover:bg-card/80'
-                    )}>
+                  <div className={cn(
+                    "inline-block p-4 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl",
+                    message.type === 'user'
+                      ? 'bg-gradient-primary text-primary-foreground rounded-br-md'
+                      : 'bg-card border border-border text-card-foreground rounded-bl-md hover:bg-muted/50'
+                  )}>
                       {message.type === 'bot' ? (
                         <div 
                           className="text-sm leading-relaxed prose prose-sm max-w-none"
@@ -193,11 +193,11 @@ const Chatbot = () => {
               ))}
               {isLoading && (
                 <div className="flex items-start gap-4 animate-fade-in">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-secondary to-secondary/80 text-secondary-foreground flex items-center justify-center shadow-lg">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center shadow-lg">
                     <Bot className="h-5 w-5" />
                   </div>
                   <div className="flex-1">
-                    <div className="inline-block p-4 rounded-2xl rounded-bl-md bg-card border border-border/50 shadow-lg">
+                    <div className="inline-block p-4 rounded-2xl rounded-bl-md bg-card border border-border shadow-lg">
                       <div className="flex items-center gap-3">
                         <Loader2 className="h-4 w-4 animate-spin text-primary" />
                         <div className="flex gap-1">
@@ -217,7 +217,7 @@ const Chatbot = () => {
         </Card>
 
         {/* Input Form */}
-        <Card className="bg-card/95 backdrop-blur-sm border-0 shadow-form">
+        <Card className="bg-card/95 backdrop-blur-sm border shadow-form">
           <CardContent className="p-4">
             <form onSubmit={handleSubmit} className="flex gap-2">
               <Input
@@ -227,10 +227,10 @@ const Chatbot = () => {
                 className="flex-1 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
                 disabled={isLoading}
               />
-              <Button
+                <Button
                 type="submit"
                 disabled={!query.trim() || isLoading}
-                className="bg-gradient-primary hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-xl"
+                className="bg-gradient-primary hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-xl text-primary-foreground"
               >
                 {isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
