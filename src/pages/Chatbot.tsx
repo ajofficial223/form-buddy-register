@@ -40,11 +40,14 @@ const Chatbot = () => {
   const formatResponse = (text: string) => {
     // Enhanced formatting for better readability
     return text
-      .replace(/\n\n/g, '\n')
+      .replace(/\n\n/g, '<br><br>')
+      .replace(/\n/g, '<br>')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/```(.*?)```/gs, '<code class="block bg-muted/50 p-2 rounded text-xs font-mono">$1</code>')
-      .replace(/`(.*?)`/g, '<code class="bg-muted/50 px-1 rounded text-xs font-mono">$1</code>');
+      .replace(/```(.*?)```/gs, '<pre class="bg-muted p-3 rounded-lg text-sm font-mono overflow-x-auto my-2"><code>$1</code></pre>')
+      .replace(/`(.*?)`/g, '<code class="bg-muted px-1 py-0.5 rounded text-sm font-mono">$1</code>')
+      .replace(/(\d+\.)\s/g, '<br><strong>$1</strong> ')
+      .replace(/([📖📍🏫🔮🎯💡⭐🚀])/g, '<span class="text-lg mr-2">$1</span>');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -78,11 +81,25 @@ const Chatbot = () => {
       if (response.ok) {
         const responseText = await response.text();
         
+        // Parse JSON response and extract the output content
+        let content = responseText;
+        try {
+          const jsonResponse = JSON.parse(responseText);
+          if (Array.isArray(jsonResponse) && jsonResponse[0]?.output) {
+            content = jsonResponse[0].output;
+          } else if (jsonResponse.output) {
+            content = jsonResponse.output;
+          }
+        } catch (e) {
+          // If it's not JSON, use the raw text
+          content = responseText;
+        }
+        
         // Add bot response
         const botMessage: Message = {
           id: (Date.now() + 1).toString(),
           type: 'bot',
-          content: responseText,
+          content: content,
           timestamp: new Date()
         };
         
