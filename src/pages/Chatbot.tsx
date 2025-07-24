@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Send, Bot, User, ArrowLeft } from "lucide-react";
+import { Loader2, Send, Bot, User, ArrowLeft, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 interface Message {
   id: string;
@@ -16,16 +17,35 @@ interface Message {
 const Chatbot = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       type: 'bot',
-      content: 'Hello! I\'m your AI Buddy. How can I help you today?',
+      content: '🤖 Hello! I\'m your AI Buddy. How can I help you today?',
       timestamp: new Date()
     }
   ]);
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const formatResponse = (text: string) => {
+    // Enhanced formatting for better readability
+    return text
+      .replace(/\n\n/g, '\n')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/```(.*?)```/gs, '<code class="block bg-muted/50 p-2 rounded text-xs font-mono">$1</code>')
+      .replace(/`(.*?)`/g, '<code class="bg-muted/50 px-1 rounded text-xs font-mono">$1</code>');
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,54 +134,85 @@ const Chatbot = () => {
       {/* Chat Container */}
       <div className="flex-1 max-w-4xl mx-auto w-full px-4 py-6 flex flex-col">
         {/* Messages */}
-        <Card className="flex-1 mb-4 bg-card/95 backdrop-blur-sm border-0 shadow-form">
-          <CardContent className="p-6 h-96 overflow-y-auto space-y-4">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex items-start gap-3 ${
-                  message.type === 'user' ? 'flex-row-reverse' : 'flex-row'
-                }`}
-              >
-                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                  message.type === 'user' 
-                    ? 'bg-primary text-primary-foreground' 
-                    : 'bg-secondary text-secondary-foreground'
-                }`}>
-                  {message.type === 'user' ? (
-                    <User className="h-4 w-4" />
-                  ) : (
-                    <Bot className="h-4 w-4" />
+        <Card className="flex-1 mb-4 bg-card/95 backdrop-blur-sm border-0 shadow-elegant">
+          <CardContent className="p-0 h-[500px] overflow-y-auto">
+            <div className="p-6 space-y-6">
+              {messages.map((message, index) => (
+                <div
+                  key={message.id}
+                  className={cn(
+                    "flex items-start gap-4 animate-fade-in opacity-0",
+                    message.type === 'user' ? 'flex-row-reverse' : 'flex-row'
                   )}
-                </div>
-                <div className={`flex-1 max-w-xs md:max-w-md ${
-                  message.type === 'user' ? 'text-right' : 'text-left'
-                }`}>
-                  <div className={`inline-block p-3 rounded-lg ${
-                    message.type === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground'
-                  }`}>
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  style={{
+                    animation: `fade-in 0.5s ease-out ${index * 0.1}s forwards`
+                  }}
+                >
+                  <div className={cn(
+                    "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110",
+                    message.type === 'user' 
+                      ? 'bg-gradient-primary text-white shadow-primary/25' 
+                      : 'bg-gradient-to-br from-secondary to-secondary/80 text-secondary-foreground shadow-secondary/25'
+                  )}>
+                    {message.type === 'user' ? (
+                      <User className="h-5 w-5" />
+                    ) : (
+                      <Bot className="h-5 w-5" />
+                    )}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {message.timestamp.toLocaleTimeString()}
-                  </p>
-                </div>
-              </div>
-            ))}
-            {isLoading && (
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center">
-                  <Bot className="h-4 w-4" />
-                </div>
-                <div className="flex-1">
-                  <div className="inline-block p-3 rounded-lg bg-muted">
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                  <div className={cn(
+                    "flex-1 max-w-[75%] transition-all duration-300",
+                    message.type === 'user' ? 'text-right' : 'text-left'
+                  )}>
+                    <div className={cn(
+                      "inline-block p-4 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl",
+                      message.type === 'user'
+                        ? 'bg-gradient-primary text-white rounded-br-md shadow-primary/20'
+                        : 'bg-card border border-border/50 text-foreground rounded-bl-md hover:bg-card/80'
+                    )}>
+                      {message.type === 'bot' ? (
+                        <div 
+                          className="text-sm leading-relaxed prose prose-sm max-w-none"
+                          dangerouslySetInnerHTML={{ __html: formatResponse(message.content) }}
+                        />
+                      ) : (
+                        <p className="text-sm leading-relaxed">{message.content}</p>
+                      )}
+                    </div>
+                    <div className={cn(
+                      "flex items-center gap-2 mt-2 text-xs text-muted-foreground",
+                      message.type === 'user' ? 'justify-end' : 'justify-start'
+                    )}>
+                      <span>{message.timestamp.toLocaleTimeString()}</span>
+                      {message.type === 'bot' && (
+                        <Sparkles className="h-3 w-3 text-primary/60" />
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              ))}
+              {isLoading && (
+                <div className="flex items-start gap-4 animate-fade-in">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-secondary to-secondary/80 text-secondary-foreground flex items-center justify-center shadow-lg">
+                    <Bot className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="inline-block p-4 rounded-2xl rounded-bl-md bg-card border border-border/50 shadow-lg">
+                      <div className="flex items-center gap-3">
+                        <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                        <div className="flex gap-1">
+                          <div className="w-2 h-2 bg-primary/60 rounded-full animate-pulse"></div>
+                          <div className="w-2 h-2 bg-primary/60 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                          <div className="w-2 h-2 bg-primary/60 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                        </div>
+                        <span className="text-sm text-muted-foreground">AI is thinking...</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
           </CardContent>
         </Card>
 
