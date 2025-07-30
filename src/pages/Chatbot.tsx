@@ -71,10 +71,10 @@ const Chatbot = () => {
       // Create URL with query parameters for GET request
       const params = new URLSearchParams({
         query: query,
-        uniqueId: "STUAMIT1"
+        uniqueId: "STUDEMO1"
       });
       
-      const response = await fetch(`https://nclbtaru.app.n8n.cloud/webhook/AI-BUDDY-MAIN?${params}`, {
+      const response = await fetch(`https://aviadigitalmind.app.n8n.cloud/webhook/AI-BUDDY-MAIN?${params}`, {
         method: "GET"
       });
 
