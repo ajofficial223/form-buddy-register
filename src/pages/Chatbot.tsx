@@ -68,15 +68,14 @@ const Chatbot = () => {
     setQuery("");
 
     try {
-      const response = await fetch('/functions/v1/ai-buddy-proxy', {
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          query: query,
-          uniqueId: "STUAMIT1"
-        })
+      // Create URL with query parameters for GET request
+      const params = new URLSearchParams({
+        query: query,
+        uniqueId: "STUDEMO1"
+      });
+      
+      const response = await fetch(`https://aviadigitalmind.app.n8n.cloud/webhook/AI-BUDDY-MAIN?${params}`, {
+        method: "GET"
       });
 
       if (response.ok) {
